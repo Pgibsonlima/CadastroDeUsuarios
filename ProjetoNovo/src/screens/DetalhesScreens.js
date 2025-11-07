@@ -4,100 +4,112 @@ import { db } from '../service/firebaseConnections';
 import React, { useEffect, useState } from 'react';
 
 export default function DetalhesScreens({ route, navigation }) {
-  const { idProduto } = route.params;
-  const [produto, setProduto] = useState(null);
+  const { idUsuario } = route.params;
+  const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editando, setEditando] = useState(false);
 
   const [nome, setNome] = useState('');
-  const [preco, setPreco] = useState('');
-  const [descricao, setDescricao] = useState('');
+  const [telefone, setTelefone] = useState('');
+  const [CPF, setCPF] = useState('');
+  const [logadouro, setLogadouro] = useState('');
+  const [bairro, setBairro] = useState('');
+  const [cidade, setCidade] = useState('');
+  const [UF, setUF] = useState('');
 
   useEffect(() => {
-    const carregarProduto = async () => {
+    const carregarUsuario = async () => {
       try {
-        const docRef = doc(db, 'produtos', idProduto);
+        const docRef = doc(db, 'Usuários', idUsuario);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
           const data = docSnap.data();
-          setProduto(data);
+          setUsuario(data);
           setNome(data.nome);
-          setPreco(String(data.preco));
-          setDescricao(data.descricao);
+          setTelefone(String(data.telefone));
+          setCPF(data.CPF);
+          setLogadouro(data.logadouro);
+          setBairro(data.setBairro);
+          setCidade(data.cidade);
+          setUF(data.UF)
 
         } else {
           Platform.OS === 'web'
-            ? window.alert('Produto não encontrado')
-            : Alert.alert('Erro!', 'Produto não encontrado');
+            ? window.alert('Usuário não encontrado')
+            : Alert.alert('Erro!', 'Usuário não encontrado');
           navigation.goBack();
         }
       } catch (error) {
-        console.error('Erro ao carregar produto', error);
-        Alert.alert('Erro', 'Não foi possível carregar o produto.');
+        console.error('Erro ao carregar os dados do usuario', error);
+        Alert.alert('Erro', 'Não foi possível carregar os dados do usuario.');
       } finally {
         setLoading(false);
       }
     };
-    carregarProduto();
+    carregarUsuario();
   }, []);
 
   const handlerAtualizar = async () => {
-    if (!nome || !preco || !descricao) {
+    if (!nome || !logadouro || !CPF || !telefone || !bairro || !cidade ||!UF )  {
       Platform.OS === 'web'
-        ? window.alert('Preencha todos os campos antes de atualizar!')
+        ? window.alert('Preencha todos os campos antes de atualizar')
         : Alert.alert('Aviso', 'Preencha todos os campos antes de atualizar!');
       return;
     }
 
     try {
-      const produtoRef = doc(db, "produtos", idProduto);
-      await updateDoc(produtoRef, {
+      const usuarioRef = doc(db, "usuarios", idUsuario);
+      await updateDoc(usuarioRef, {
         nome,
-        preco: parseFloat(preco),
-        descricao,
+        telefone,
+        CPF,
+        logadouro,
+        bairro,
+        cidade,
+        UF
       });
 
       Platform.OS === 'web'
-        ? window.alert('Produto atualizado com sucesso!')
-        : Alert.alert('Sucesso', 'Produto atualizado com sucesso!');
+        ? window.alert('Usuário atualizado com sucesso!')
+        : Alert.alert('Sucesso', 'Usuário atualizado com sucesso!');
 
       setEditando(false);
       navigation.goBack()
 
     } catch (error) {
       console.error("Erro ao atualizar:", error);
-      Alert.alert('Erro!', 'Não foi possível atualizar o produto.');
+      Alert.alert('Erro!', 'Não foi possível atualizar o usuario.');
     }
   };
 
   const handlerExcluir = async () => {
     if (Platform.OS === 'web') {
-      const confirmar = window.confirm("Deseja realmente excluir este produto?");
+      const confirmar = window.confirm("Deseja realmente excluir este usuario?");
       if (!confirmar) return;
 
       try {
-        await deleteDoc(doc(db, 'produtos', idProduto));
-        alert("Produto excluído com sucesso!");
+        await deleteDoc(doc(db, 'Usuários', idUsuario));
+        alert("Usuário excluído com sucesso!");
         navigation.goBack();
       } catch (error) {
         console.error("Erro ao deletar: ", error);
-        alert("Não foi possível excluir o produto.");
+        alert("Não foi possível excluir o usuario.");
       }
     } else {
-      Alert.alert("Confirmação", "Deseja realmente excluir este produto?", [
+      Alert.alert("Confirmação", "Deseja realmente excluir este usuario?", [
         { text: "Cancelar", style: "cancel" },
         {
           text: "Excluir",
           style: "destructive",
           onPress: async () => {
             try {
-              await deleteDoc(doc(db, "produtos", idProduto));
-              Alert.alert("Excluído", "Produto removido com sucesso!");
+              await deleteDoc(doc(db, "Usuários", idUsuario));
+              Alert.alert("Excluído", "Usuário removido com sucesso!");
               navigation.goBack();
             } catch (error) {
               console.error("Erro ao deletar", error);
-              Alert.alert("Erro", "Não foi possível deletar o produto");
+              Alert.alert("Erro", "Não foi possível deletar o usuario");
             }
           }
         }
@@ -109,7 +121,7 @@ export default function DetalhesScreens({ route, navigation }) {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.titulo}>Detalhes do Produto</Text>
+      <Text style={styles.titulo}>Detalhes do Usuário</Text>
 
       <Text style={styles.label}>Nome</Text>
       <TextInput
@@ -123,8 +135,8 @@ export default function DetalhesScreens({ route, navigation }) {
       <Text style={styles.label}>Preço</Text>
       <TextInput
         style={styles.input}
-        value={preco}
-        onChangeText={setPreco}
+        value={telefone}
+        onChangeText={setTelefone}
         editable={editando}
         keyboardType='numeric'
       />
@@ -132,8 +144,8 @@ export default function DetalhesScreens({ route, navigation }) {
       <Text style={styles.label}>Descrição</Text>
       <TextInput
         style={[styles.input, { height: 100 }]}
-        value={descricao}
-        onChangeText={setDescricao}
+        value={CPF}
+        onChangeText={setCPF}
         editable={editando}
         multiline
       />
@@ -147,7 +159,7 @@ export default function DetalhesScreens({ route, navigation }) {
       </View>
 
       <View style={styles.botoes}>
-        <Button title='Excluir Produto' color="red" onPress={handlerExcluir} />
+        <Button title='Excluir Usuário' color="red" onPress={handlerExcluir} />
       </View>
     </ScrollView>
   );
