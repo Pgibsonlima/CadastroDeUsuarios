@@ -4,12 +4,12 @@ import { StyleSheet, Text, View,TouchableOpacity } from 'react-native';
 export default function HomeScreen({navigation}) {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}> GERENCIADOR DE PRODUTO</Text>
+        <Text style={styles.title}> GERENCIADOR DE CADASTRO DE USUÁRIO</Text>
         <TouchableOpacity 
         style={styles.styleButtom}
         onPress={()=> navigation.navigate('Cadastro')}>
         
-        <Text style={styles.buttomText}>Cadastrar Produto</Text>
+        <Text style={styles.buttomText}>Cadastrar o Usuário </Text>
 
         </TouchableOpacity>
         
@@ -18,7 +18,7 @@ export default function HomeScreen({navigation}) {
         style={styles.styleButtom}
         onPress={()=> navigation.navigate('Lista')}>
         
-        <Text style={styles.buttomText}>Listar Produto</Text>
+        <Text style={styles.buttomText}>Listar Usuário</Text>
 
         </TouchableOpacity>
       </View>

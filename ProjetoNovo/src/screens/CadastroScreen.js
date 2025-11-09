@@ -1,22 +1,52 @@
 import { Platform, StyleSheet, Text, View, Button, TextInput, Alert } from 'react-native';
 import React, { useState } from 'react';
-import { criarCadastro } from '../service/ProdutosService';
+import { criarCadastro } from '../service/CadastroService';
 
 export default function CadastroScreen() {
   const [nome, setNome] = useState('');
   const [telefone, setTelefone] = useState('');
   const [CPF, setCPF] = useState('');
-  const [logadouro, setLogadouro] = useState('');
+  const [cep, setCep] = useState('');
+  const [logradouro, setLogradouro] = useState('');
   const [bairro, setBairro] = useState('');
   const [cidade, setCidade] = useState('');
   const [UF, setUF] = useState('');
 
+  const buscarCep = async () => {
+    if (cep.length !== 8) {
+      Platform.OS === 'web'
+        ? window.alert('Por favor, insira um CEP válido com 8 dígitos!')
+        : Alert.alert('Erro!', 'Por favor, insira um CEP válido com 8 dígitos!');
+      return;
+    }
+
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await response.json();
+
+      if (!data.erro) {
+        setLogradouro(data.logradouro || '');
+        setBairro(data.bairro || '');
+        setCidade(data.localidade || '');
+        setUF(data.uf || '');
+      } else {
+        Platform.OS === 'web'
+          ? window.alert('CEP não encontrado!')
+          : Alert.alert('Erro!', 'CEP não encontrado!');
+      }
+    } catch (error) {
+      console.error('Erro ao buscar CEP:', error);
+      Platform.OS === 'web'
+        ? window.alert('Erro ao consultar o CEP!')
+        : Alert.alert('Erro!', 'Erro ao consultar o CEP!');
+    }
+  };
+
   const cadastroUsuario = async () => {
-    if (nome === '' || CPF === '' || logadouro === '') {
+    if (nome === '' || CPF === '' || logradouro === '' || cep === '') {
       Platform.OS === 'web'
         ? window.alert('Por favor, preencha os campos obrigatórios!')
         : Alert.alert('Erro!', 'Por favor, preencha os campos obrigatórios!');
-
       return;
     }
 
@@ -24,10 +54,11 @@ export default function CadastroScreen() {
       nome,
       telefone,
       CPF,
-      logadouro,
+      cep,
+      logradouro,
       bairro,
       cidade,
-      UF
+      UF,
     };
 
     try {
@@ -40,14 +71,13 @@ export default function CadastroScreen() {
       setNome('');
       setTelefone('');
       setCPF('');
-      setLogadouro('');
+      setCep('');
+      setLogradouro('');
       setBairro('');
       setCidade('');
       setUF('');
-
     } catch (error) {
       console.error('Erro ao cadastrar o usuário', error);
-
       Platform.OS === 'web'
         ? window.alert('Erro ao cadastrar o usuário. Tente novamente mais tarde!')
         : Alert.alert('Erro!', 'Erro ao cadastrar o usuário. Tente novamente mais tarde!');
@@ -82,11 +112,21 @@ export default function CadastroScreen() {
         style={styles.input}
       />
 
+      <Text style={styles.label}>CEP *</Text>
+      <TextInput
+        value={cep}
+        onChangeText={setCep}
+        keyboardType="numeric"
+        placeholder="Digite o CEP"
+        style={styles.input}
+        onBlur={buscarCep} 
+      />
+
       <Text style={styles.label}>Logradouro *</Text>
       <TextInput
-        value={logadouro}
-        onChangeText={setLogadouro}
-        placeholder="Digite seu endereço"
+        value={logradouro}
+        onChangeText={setLogradouro}
+        placeholder="Digite o seu endereço"
         style={styles.input}
       />
 
@@ -111,7 +151,6 @@ export default function CadastroScreen() {
         value={UF}
         onChangeText={setUF}
         placeholder="UF"
-        maxLength={2}
         style={styles.input}
       />
 
@@ -124,11 +163,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f0f0f0"
+    backgroundColor: "#f0f0f0",
   },
   label: {
     fontWeight: 'bold',
     marginTop: 10,
+    color: '#333',
   },
   input: {
     height: 40,
@@ -137,6 +177,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 10,
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
   },
 });

@@ -1,18 +1,17 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import{
-    getFirestore,
-    collection,
-    addDoc,
-    doc,
-    getDoc,
-    getDocs,
-    query,
-    orderBy,
-    onSnapshot,
-    updateDoc,
-    deleteDoc,
-    serverTimestamp
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  orderBy,
+  onSnapshot,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -24,23 +23,22 @@ const firebaseConfig = {
   appId: "1:89277804061:web:4bd104d9c593525a2e20f4"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const produtosCollection = collection(db,"produtos");
+const usuariosCollection = collection(db, "usuarios");
 
-export{
-    db,
-    produtosCollection,
-    addDoc,
-    doc,
-    getDoc,
-    getDocs,
-    query,
-    orderBy,
-    onSnapshot,
-    updateDoc,
-    deleteDoc,
-}
-
+export {
+  db,
+  usuariosCollection,
+  addDoc,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  orderBy,
+  onSnapshot,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp
+};
